@@ -27,7 +27,8 @@ async function loadGroups() {
     const data = await response.json();
     const groups = data.parties || [];
     groups.forEach(group => {
-      const link = group.link || `group_${group.name.toLowerCase().replace(/\s+/g, '_')}.html`;
+      // const link = group.link || `group_${group.name.toLowerCase().replace(/\s+/g, '_')}.html`;
+      const link = `group_table.html?code=${encodeURIComponent(group._id)}`;
       const card = createGroupCard(group.name, group.description, link);
       container.appendChild(card);
     });
