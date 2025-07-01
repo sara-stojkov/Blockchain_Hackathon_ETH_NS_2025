@@ -1,6 +1,5 @@
 const express = require('express');
-const connetDB = require('./database/connect');
-const { User } = require('./models');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 
@@ -17,9 +16,7 @@ app.use('/api/users', require('./routers/userRouter'));
 
 const startServer = async () => {
 	try {
-        
-		await connetDB(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.ldgod.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`);
-		await User.create({nickname: 'Mihajlo', publicKey: 'mihajlo_public_key'});
+		await mongoose.connect(`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.ldgod.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`);
         app.listen(PORT, () => console.log(`Server listens on http://localhost:${PORT}`))
 	} catch (error) {
 		console.error(error);
