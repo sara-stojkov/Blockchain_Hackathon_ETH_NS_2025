@@ -1,4 +1,4 @@
-const API_URL = "https://social-roses-stay.loca.lt/"
+const API_URL = "https://silent-ears-rule.loca.lt"
 
 document.addEventListener('DOMContentLoaded', () => {
   const connectButton = document.getElementById('connect-button');
