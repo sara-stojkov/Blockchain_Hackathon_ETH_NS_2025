@@ -1,3 +1,5 @@
+const API_URL = "https://social-roses-stay.loca.lt/"
+
 const groups = [
   {
     name: "Group Alpha",
@@ -12,6 +14,11 @@ const groups = [
 ];
 
 function initPage() {
+    const jwtToken = localStorage.getItem('jwtToken');
+    if (!jwtToken) {
+        window.location.href = './login.html';
+        return;
+    }
   loadGroups();
   setupUsername();
 }
@@ -110,11 +117,29 @@ function setupUsername() {
     usernameDisplay.replaceWith(input);
     input.focus();
 
-    function saveUsername() {
+    async function saveUsername() {
       const newName = input.value.trim();
       if(newName) {
-        localStorage.setItem('username', newName);
+        const res = await fetch(`${API_URL}/api/users`, {
+          method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+            },
+            body: JSON.stringify({ nickname: newName })
+        });
+        if(!res.ok) {
+            alert('Failed to update username. Please try again.');
+            input.replaceWith(usernameDisplay);
+            usernameDisplay.textContent = username;
+            return;
+            }
+        const data = await res.json();
+        console.log('Username updated:', data);
         username = newName;
+        localStorage.setItem('username', username);
+        localStorage.setItem('jwtToken', data.token || localStorage.getItem('jwtToken'));
+        localStorage.setItem("user", JSON.stringify(data.user) || localStorage.getItem("user"));
       }
       input.replaceWith(usernameDisplay);
       usernameDisplay.textContent = username;
