@@ -1,4 +1,5 @@
-const API_URL = "https://social-roses-stay.loca.lt/"
+// const API_URL = "https://social-roses-stay.loca.lt/"
+const API_URL = "http://192.168.8.102:3000"
 
 document.addEventListener('DOMContentLoaded', () => {
   const connectButton = document.getElementById('connect-button');
