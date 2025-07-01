@@ -212,7 +212,7 @@ function payWithBlockchain(personName) {
     showPaymentConfirmationModal(personName, 'blockchain');
 }
 
-function processPayment(personName, paymentMethod) {
+function processPayment(personName, paymentMethod, paymentAmount) {
     const rows = document.querySelectorAll('#payment-table tbody tr');
     
     rows.forEach(row => {
@@ -222,7 +222,9 @@ function processPayment(personName, paymentMethod) {
             const statusCell = row.querySelector('td:nth-child(3) .status');
             
             if (amountCell && statusCell) {
-                const currentAmount = amountCell.textContent;
+                const currentAmountText = amountCell.textContent.replace('$', '');
+                const currentAmount = parseFloat(currentAmountText) || 0;
+                const newAmount = Math.max(0, currentAmount - paymentAmount);
                 
                 // Show processing animation
                 const paymentButtons = row.querySelectorAll('.payment-btn');
@@ -233,17 +235,24 @@ function processPayment(personName, paymentMethod) {
                 
                 // Simulate payment processing
                 setTimeout(() => {
-                    // Mark as paid
-                    amountCell.textContent = '$0.00';
-                    statusCell.textContent = 'Paid';
-                    statusCell.className = 'status paid';
+                    // Update the amount
+                    amountCell.textContent = `$${newAmount.toFixed(2)}`;
                     
-                    // Add success animation
-                    row.style.backgroundColor = '#d4edda';
+                    // Update status based on remaining amount
+                    if (newAmount === 0) {
+                        statusCell.textContent = 'Paid';
+                        statusCell.className = 'status paid';
+                        row.style.backgroundColor = '#d4edda'; // Green for fully paid
+                    } else {
+                        statusCell.textContent = 'Pending';
+                        statusCell.className = 'status pending';
+                        row.style.backgroundColor = '#fff3cd'; // Yellow for partial payment
+                    }
                     
                     // Show success message
                     const methodName = paymentMethod === 'cash' ? 'Cash' : 'Blockchain';
-                    showSuccessModal(`${methodName} payment successful!\n${personName} has paid ${currentAmount}`);
+                    const statusText = newAmount === 0 ? 'Fully Paid!' : `Partial Payment - $${newAmount.toFixed(2)} remaining`;
+                    showSuccessModal(`${methodName} payment successful!\n${personName} paid $${paymentAmount.toFixed(2)}\nStatus: ${statusText}`);
                     
                     // Reset buttons
                     paymentButtons.forEach(btn => {
@@ -398,9 +407,28 @@ function showPaymentConfirmationModal(personName, paymentMethod) {
     const personNameSpan = document.getElementById('payment-person-name');
     const methodSpan = document.getElementById('payment-method');
     const confirmBtn = document.getElementById('confirm-payment');
+    const totalAmountOwedSpan = document.getElementById('total-amount-owed');
+    const paymentSlider = document.getElementById('payment-amount-slider');
+    const paymentAmountDisplay = document.getElementById('payment-amount-display');
+    
+    // Get current amount owed for this person
+    const currentAmount = getCurrentAmountOwed(personName);
     
     personNameSpan.textContent = personName;
     methodSpan.textContent = paymentMethod === 'cash' ? 'Cash' : 'Blockchain';
+    totalAmountOwedSpan.textContent = `$${currentAmount.toFixed(2)}`;
+    
+    // Set up slider
+    paymentSlider.min = 0;
+    paymentSlider.max = currentAmount;
+    paymentSlider.value = currentAmount; // Default to full amount
+    paymentAmountDisplay.textContent = `$${currentAmount.toFixed(2)}`;
+    
+    // Add slider event listener
+    paymentSlider.oninput = function() {
+        const selectedAmount = parseFloat(this.value);
+        paymentAmountDisplay.textContent = `$${selectedAmount.toFixed(2)}`;
+    };
     
     // Remove existing event listeners
     const newConfirmBtn = confirmBtn.cloneNode(true);
@@ -408,11 +436,30 @@ function showPaymentConfirmationModal(personName, paymentMethod) {
     
     // Add new event listener
     newConfirmBtn.addEventListener('click', function() {
-        processPayment(personName, paymentMethod);
+        const paymentAmount = parseFloat(paymentSlider.value);
+        processPayment(personName, paymentMethod, paymentAmount);
         hideModal(modal);
     });
     
     showModal(modal);
+}
+
+function getCurrentAmountOwed(personName) {
+    const rows = document.querySelectorAll('#payment-table tbody tr');
+    let currentAmount = 0;
+    
+    rows.forEach(row => {
+        const nameCell = row.querySelector('.name');
+        if (nameCell && nameCell.textContent.trim() === personName) {
+            const amountCell = row.querySelector('td:nth-child(2)');
+            if (amountCell) {
+                const amountText = amountCell.textContent.replace('$', '');
+                currentAmount = parseFloat(amountText) || 0;
+            }
+        }
+    });
+    
+    return currentAmount;
 }
 
 function showSuccessModal(message) {
@@ -427,4 +474,15 @@ function showErrorModal(message) {
     const messageElement = document.getElementById('error-message');
     messageElement.textContent = message;
     showModal(modal);
+}
+
+// Quick payment function for percentage buttons
+function setQuickPayment(percentage) {
+    const paymentSlider = document.getElementById('payment-amount-slider');
+    const paymentAmountDisplay = document.getElementById('payment-amount-display');
+    const maxAmount = parseFloat(paymentSlider.max);
+    
+    const selectedAmount = (maxAmount * percentage) / 100;
+    paymentSlider.value = selectedAmount;
+    paymentAmountDisplay.textContent = `$${selectedAmount.toFixed(2)}`;
 }

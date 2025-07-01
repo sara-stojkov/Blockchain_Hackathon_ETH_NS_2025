@@ -157,6 +157,26 @@
         <div class="modal-content">
             <h3>Confirm Payment</h3>
             <p>Process <span id="payment-method">Cash</span> payment for <span id="payment-person-name">Person</span>?</p>
+            
+            <div class="payment-slider-container">
+                <div class="amount-info">
+                    <span>Total Amount Owed: <strong id="total-amount-owed">$0.00</strong></span>
+                </div>
+                <div class="quick-payment-buttons">
+                    <button type="button" class="quick-pay-btn" onclick="setQuickPayment(25)">25%</button>
+                    <button type="button" class="quick-pay-btn" onclick="setQuickPayment(50)">50%</button>
+                    <button type="button" class="quick-pay-btn" onclick="setQuickPayment(75)">75%</button>
+                    <button type="button" class="quick-pay-btn" onclick="setQuickPayment(100)">100%</button>
+                </div>
+                <div class="slider-section">
+                    <label for="payment-amount-slider">Payment Amount:</label>
+                    <input type="range" id="payment-amount-slider" min="0" max="100" value="0" step="0.01">
+                    <div class="slider-value">
+                        <span id="payment-amount-display">$0.00</span>
+                    </div>
+                </div>
+            </div>
+            
             <div class="modal-buttons">
                 <button id="confirm-payment" class="modal-btn primary-btn">Confirm Payment</button>
                 <button onclick="hideModal(document.getElementById('payment-confirmation-modal'))" class="modal-btn secondary-btn">Cancel</button>
