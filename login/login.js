@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
             const account = accounts[0];
             console.log('Connected account:', account);
-            window.location.href = 'index.html';
+            window.location.href = '/index/index.html'; // Redirect to the main page after connection
           } catch (error) {
             console.error('Error connecting to MetaMask', error);
           }
