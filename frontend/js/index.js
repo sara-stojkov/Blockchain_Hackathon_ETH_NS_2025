@@ -27,8 +27,8 @@ async function loadGroups() {
     const data = await response.json();
     const groups = data.parties || [];
     groups.forEach(group => {
-      // const link = group.link || `group_${group.name.toLowerCase().replace(/\s+/g, '_')}.html`;
-      const link = `group_table.html?code=${encodeURIComponent(group._id)}`;
+      const code = group._id;
+      const link = `group.html?code=${encodeURIComponent(code)}`;
       const card = createGroupCard(group.name, group.description, link);
       container.appendChild(card);
     });
@@ -173,6 +173,8 @@ function setupUsername() {
   });
 }
 
+// Modal za unos pristupnog koda i njegovo slanje na backend
+
 function openAccessCodeModal() {
   if (document.getElementById('accessCodeModalOverlay')) return;
 
@@ -199,25 +201,60 @@ function openAccessCodeModal() {
     document.body.removeChild(overlay);
   });
 
-  document.getElementById('submitAccessCodeBtn').addEventListener('click', () => {
+  document.getElementById('submitAccessCodeBtn').addEventListener('click', async () => {
     const codeInput = document.getElementById('accessCodeInput').value.trim();
     if (!codeInput) {
       alert('Please enter an access code or link.');
       return;
     }
 
-    createAndAddGroupCardFromCode(codeInput);
-    document.body.removeChild(overlay);
+    try {
+      await addGroupByAccessCode(codeInput);
+      document.body.removeChild(overlay);
+    } catch (error) {
+      alert('Failed to save access code. Please try again.');
+      console.error(error);
+    }
   });
 }
 
-function createAndAddGroupCardFromCode(code) {
-  const container = document.getElementById('groupContainer');
+async function addGroupByAccessCode(code) {
+  const jwtToken = localStorage.getItem('jwtToken');
+  if (!jwtToken) {
+    alert('User not authenticated');
+    return;
+  }
 
-  const name = `Group from code`;
-  const description = `Access code: ${code}`;
-  const link = `${API_URL}parties/join/${code}`;
+  try {
+    const response = await fetch(`${API_URL}/api/parties/join/${code}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`
+      },
+    });
 
-  const card = createGroupCard(name, description, link);
-  container.appendChild(card);
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Server error: ${errText}`);
+    }
+
+    const data = await response.json();
+    const party = data.party;
+    if (!party) {
+      throw new Error('No party data returned from server');
+    }
+
+    // Dodaj grupu u UI
+    const container = document.getElementById('groupContainer');
+    const name = party.name || 'Unnamed Group';
+    const description = party.description || '';
+    const link = `group.html?code=${encodeURIComponent(party._id || party.id || '')}`;
+
+    const card = createGroupCard(name, description, link);
+    container.appendChild(card);
+
+  } catch (error) {
+    alert(`Failed to join group: ${error.message}`);
+    console.error(error);
+  }
 }
