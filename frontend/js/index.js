@@ -1,36 +1,41 @@
 const API_URL = "https://silent-ears-rule.loca.lt"
 
-const groups = [
-  {
-    name: "Group Alpha",
-    description: "Handles research funding distributions.",
-    link: "group_alpha.html"
-  },
-  {
-    name: "Group Beta",
-    description: "Manages citation validation and ETH payouts.",
-    link: "group_beta.html"
+async function initPage() {
+  const jwtToken = localStorage.getItem('jwtToken');
+  if (!jwtToken) {
+    window.location.href = './login.html';
+    return;
   }
-];
-
-function initPage() {
-    const jwtToken = localStorage.getItem('jwtToken');
-    if (!jwtToken) {
-        window.location.href = './login.html';
-        return;
-    }
-  loadGroups();
+  await loadGroups();
   setupUsername();
 }
 
-function loadGroups() {
+async function loadGroups() {
   const container = document.getElementById("groupContainer");
   container.innerHTML = "";
 
-  groups.forEach(group => {
-    const card = createGroupCard(group.name, group.description, group.link);
-    container.appendChild(card);
-  });
+  try {
+    const jwtToken = localStorage.getItem('jwtToken');
+    const response = await fetch(`${API_URL}/api/parties`, {
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`
+      }
+    });
+
+    if (!response.ok) throw new Error("Failed to load groups.");
+
+    const data = await response.json();
+    const groups = data.parties || [];
+    groups.forEach(group => {
+      const code = group._id;
+      const link = `group_table.html?code=${encodeURIComponent(code)}`;
+      const card = createGroupCard(group.name, group.description, link);
+      container.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error("Error loading groups:", error);
+  }
 }
 
 function createGroupCard(name, description, link) {
@@ -47,7 +52,7 @@ function createGroupCard(name, description, link) {
 }
 
 function addNewGroup() {
-  if(document.getElementById('newGroupFormOverlay')) return;
+  if (document.getElementById('newGroupFormOverlay')) return;
 
   const overlay = document.createElement('div');
   overlay.id = 'newGroupFormOverlay';
@@ -63,9 +68,6 @@ function addNewGroup() {
     <label for="groupDescription">Description:</label>
     <textarea id="groupDescription" name="groupDescription" required></textarea>
 
-    <label for="groupLink">Link (e.g. group_xyz.html):</label>
-    <input type="text" id="groupLink" name="groupLink" required />
-
     <div class="group-form-buttons">
       <button type="button" class="cancel-btn">Cancel</button>
       <button type="submit" class="save-btn">Save</button>
@@ -79,21 +81,39 @@ function addNewGroup() {
     document.body.removeChild(overlay);
   });
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
 
     const name = form.groupName.value.trim();
     const description = form.groupDescription.value.trim();
-    const link = form.groupLink.value.trim();
 
-    if(name && description && link) {
-      groups.push({ name, description, link });
+    if (name && description) {
+      try {
+        const jwtToken = localStorage.getItem('jwtToken');
+        const response = await fetch(`${API_URL}/api/parties`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`
+          },
+          body: JSON.stringify({ name, description })
+        });
 
-      const container = document.getElementById('groupContainer');
-      const newCard = createGroupCard(name, description, link);
-      container.appendChild(newCard);
+        if (!response.ok) {
+          alert('Failed to save new group. Please try again.');
+          return;
+        }
 
-      document.body.removeChild(overlay);
+        await response.json();
+
+        await loadGroups();
+
+        document.body.removeChild(overlay);
+
+      } catch (error) {
+        alert('Error occurred while saving group.');
+        console.error(error);
+      }
     } else {
       alert('Please fill in all fields!');
     }
@@ -119,23 +139,22 @@ function setupUsername() {
 
     async function saveUsername() {
       const newName = input.value.trim();
-      if(newName) {
+      if (newName) {
         const res = await fetch(`${API_URL}/api/users`, {
           method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
-            },
-            body: JSON.stringify({ nickname: newName })
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+          },
+          body: JSON.stringify({ nickname: newName })
         });
-        if(!res.ok) {
-            alert('Failed to update username. Please try again.');
-            input.replaceWith(usernameDisplay);
-            usernameDisplay.textContent = username;
-            return;
-            }
+        if (!res.ok) {
+          alert('Failed to update username. Please try again.');
+          input.replaceWith(usernameDisplay);
+          usernameDisplay.textContent = username;
+          return;
+        }
         const data = await res.json();
-        console.log('Username updated:', data);
         username = newName;
         localStorage.setItem('username', username);
         localStorage.setItem('jwtToken', data.token || localStorage.getItem('jwtToken'));
@@ -147,9 +166,92 @@ function setupUsername() {
 
     input.addEventListener('blur', saveUsername);
     input.addEventListener('keydown', e => {
-      if(e.key === 'Enter') {
+      if (e.key === 'Enter') {
         input.blur();
       }
     });
   });
+}
+
+function openAccessCodeModal() {
+  if (document.getElementById('accessCodeModalOverlay')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'accessCodeModalOverlay';
+  overlay.className = 'modal-overlay';
+
+  const modal = document.createElement('div');
+  modal.className = 'group-form';
+
+  modal.innerHTML = `
+    <label for="accessCodeInput">Enter Access Code (Link):</label>
+    <input type="text" id="accessCodeInput" placeholder="Enter code or link" />
+    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+      <button id="cancelAccessCodeBtn" class="cancel-btn">Cancel</button>
+      <button id="submitAccessCodeBtn" class="save-btn">Submit</button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  document.getElementById('cancelAccessCodeBtn').addEventListener('click', () => {
+    document.body.removeChild(overlay);
+  });
+
+  document.getElementById('submitAccessCodeBtn').addEventListener('click', async () => {
+    const codeInput = document.getElementById('accessCodeInput').value.trim();
+    if (!codeInput) {
+      alert('Please enter an access code or link.');
+      return;
+    }
+
+    try {
+      await addGroupByAccessCode(codeInput);
+      document.body.removeChild(overlay);
+    } catch (error) {
+      alert('Failed to save access code. Please try again.');
+      console.error(error);
+    }
+  });
+}
+
+async function addGroupByAccessCode(code) {
+  const jwtToken = localStorage.getItem('jwtToken');
+  if (!jwtToken) {
+    alert('User not authenticated');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/parties/join/${code}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`
+      },
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Server error: ${errText}`);
+    }
+
+    const data = await response.json();
+    const party = data.party;
+    if (!party) {
+      throw new Error('No party data returned from server');
+    }
+
+    const container = document.getElementById('groupContainer');
+    const name = party.name || 'Unnamed Group';
+    const description = party.description || '';
+    const link = `group.html?code=${encodeURIComponent(party._id || party.id || '')}`;
+
+    const card = createGroupCard(name, description, link);
+    container.appendChild(card);
+
+  } catch (error) {
+    alert(`Failed to join group: ${error.message}`);
+    console.error(error);
+  }
 }

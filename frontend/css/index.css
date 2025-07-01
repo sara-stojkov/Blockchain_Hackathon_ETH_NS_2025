@@ -13,7 +13,6 @@ html, body {
   background-color: #f0f2f5;
   color: #333;
   background: linear-gradient(135deg, #be6d21 10%, #1904E5 100%);
-
 }
 
 header {
@@ -64,6 +63,8 @@ header {
   position: absolute;
   top: 40px;
   right: 20px;
+  display: flex;
+  align-items: center;
 }
 
 .add-group-button {
@@ -76,11 +77,30 @@ header {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   transition: background-color 0.3s ease;
+  /* margin-right: 10px;  ako želiš razmak */
 }
 
 /* .add-group-button:hover {
   background-color: #3e8e41;
 } */
+
+.access-code-button {
+  padding: 12px 25px;
+  background-color: #1e90ff;   /* svetlo plava */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(30, 144, 255, 0.3);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-left: 10px; /* razmak od dugmeta Add Group */
+}
+
+.access-code-button:hover {
+  background-color: #0c66d1; /* tamnija plava na hover */
+  box-shadow: 0 6px 14px rgba(12, 102, 209, 0.5);
+}
 
 .group-container {
   flex: 1;
