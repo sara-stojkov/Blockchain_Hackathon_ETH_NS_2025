@@ -1,0 +1,131 @@
+/* Opšta podešavanja */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", sans-serif;
+  background: linear-gradient(135deg, #be6d21 10%, #1904E5 100%);
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.box-form {
+  width: 60%;
+  max-width: 600px;
+  margin: 5vh auto;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px 6px #090b6f85;
+  background-color: #fff;
+}
+
+.box-form .left {
+  /* background:  center center / cover no-repeat; */
+  background: url('/images/loginBackground.jpg') center center / cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  position: relative;
+}
+
+.box-form .left .overlay {
+  background-color: rgba(129, 136, 255, 0.8);
+  width: 100%;
+  height: 100%;
+  padding: 3vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  text-align: center;
+  color: #fff;
+}
+
+.box-form .left .overlay h1 {
+  font-size: 6vw;
+  margin: 0;
+}
+
+#main-description {
+  font-size: 1.5vw;
+  margin-top: 2vh;
+}
+
+.box-form .right {
+  padding: 2vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 100%;  
+  align-items: center;
+  background-color: #fff;
+}
+
+.box-form .right h5 {
+  font-size: 3vw;
+  margin-bottom: 20px;
+  margin-top: 0;
+}
+
+.box-form .right h4 {
+  font-size: 1.2vw;
+  margin: 5px 0;
+  text-align: center;
+}
+
+.box-form .right button {
+  color: #fff;
+  font-size: 1.5vw;
+  padding: 12px 35px;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  outline: 0;
+  margin-top: 30px;
+  cursor: pointer;
+  background-image: linear-gradient(135deg, #b0590c 10%, #da751c 100%);
+  box-shadow: 0px 4px 20px 0px #956e0ca6;
+  transition: 0.3s;
+}
+
+.box-form .right button img {
+  height: 25px;
+}
+
+@media (max-width: 768px) {
+  .box-form {
+    width: 90%;  
+    max-width: none;
+  }
+
+  .box-form .left {
+    height: 30vh;
+  }
+
+  .box-form .left .overlay h1 {
+    font-size: 10vw;
+  }
+
+  #main-description {
+    font-size: 3.5vw;
+  }
+
+  .box-form .right h5 {
+    font-size: 6vw;
+  }
+
+  .box-form .right h4 {
+    font-size: 3.5vw;
+  }
+
+  .box-form .right button {
+    font-size: 4vw;
+    padding: 10px 25px;
+  }
+}
+

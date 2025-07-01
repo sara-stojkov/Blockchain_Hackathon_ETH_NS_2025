@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment Splitter - Groups</title>
+  <link rel="stylesheet" href="./css/index.css" />
+  <script src="./js/index.js" defer></script>
+</head>
+<body onload="initPage()">
+  <header>
+    <div id="usernameContainer">
+      <span id="usernameDisplay" title="Click to edit username"></span>
+    </div>
+
+    <h1>Welcome to Payment Splitter</h1>
+    <p>Select a group to continue</p>
+    
+    <div class="add-group-wrapper">
+      <button class="add-group-button" onclick="addNewGroup()">+ Add Group</button>
+    </div>
+  </header>
+
+  <main class="group-container" id="groupContainer">
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Payment Splitter. All rights reserved.</p>
+  </footer>
+</body>
+</html>
