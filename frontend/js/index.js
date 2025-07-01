@@ -28,7 +28,7 @@ async function loadGroups() {
     const groups = data.parties || [];
     groups.forEach(group => {
       const code = group._id;
-      const link = `group.html?code=${encodeURIComponent(code)}`;
+      const link = `group_table.html?code=${encodeURIComponent(code)}`;
       const card = createGroupCard(group.name, group.description, link);
       container.appendChild(card);
     });
@@ -173,8 +173,6 @@ function setupUsername() {
   });
 }
 
-// Modal za unos pristupnog koda i njegovo slanje na backend
-
 function openAccessCodeModal() {
   if (document.getElementById('accessCodeModalOverlay')) return;
 
@@ -244,7 +242,6 @@ async function addGroupByAccessCode(code) {
       throw new Error('No party data returned from server');
     }
 
-    // Dodaj grupu u UI
     const container = document.getElementById('groupContainer');
     const name = party.name || 'Unnamed Group';
     const description = party.description || '';
