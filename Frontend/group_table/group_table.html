@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Table</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="box-form">
+        <div class="left">
+            <div class="overlay">
+                <h1>Group Expenses</h1>
+                <p id="main-description">Manage your group payments and settle expenses</p>
+            </div>
+        </div>
+        <div class="right">
+            <h5>Payment Overview</h5>
+            
+            <!-- Payment Table -->
+            <div class="table-container">
+                <table id="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Amount Owed</th>
+                            <th>Status</th>
+                            <th>Cash</th>
+                            <th>BlockChain</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sample data - you can replace this later -->
+                        <tr>
+                            <td>
+                                <div class="name-container">
+                                    <div class="name">John Doe</div>
+                                    <div class="address">0x1A2B3C4D5E6F7890123456789ABCDEF01234</div>
+                                </div>
+                            </td>
+                            <td>$25.50</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><button class="payment-btn cash-btn" onclick="payWithCash('John Doe')">Pay Cash</button></td>
+                            <td><button class="payment-btn blockchain-btn" onclick="payWithBlockchain('John Doe')">Pay BlockChain</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="name-container">
+                                    <div class="name">Jane Smith</div>
+                                    <div class="address">0x9876543210ABCDEF0123456789ABCDEF98765</div>
+                                </div>
+                            </td>
+                            <td>$18.75</td>
+                            <td><span class="status paid">Paid</span></td>
+                            <td><button class="payment-btn cash-btn" onclick="payWithCash('Jane Smith')">Pay Cash</button></td>
+                            <td><button class="payment-btn blockchain-btn" onclick="payWithBlockchain('Jane Smith')">Pay BlockChain</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="name-container">
+                                    <div class="name">Mike Johnson</div>
+                                    <div class="address">0xABCDEF0123456789ABCDEF0123456789ABCD</div>
+                                </div>
+                            </td>
+                            <td>$32.25</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><button class="payment-btn cash-btn" onclick="payWithCash('Mike Johnson')">Pay Cash</button></td>
+                            <td><button class="payment-btn blockchain-btn" onclick="payWithBlockchain('Mike Johnson')">Pay BlockChain</button></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="name-container">
+                                    <div class="name">Sarah Wilson</div>
+                                    <div class="address">0x456789ABCDEF0123456789ABCDEF012345</div>
+                                </div>
+                            </td>
+                            <td>$15.00</td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><button class="payment-btn cash-btn" onclick="payWithCash('Sarah Wilson')">Pay Cash</button></td>
+                            <td><button class="payment-btn blockchain-btn" onclick="payWithBlockchain('Sarah Wilson')">Pay BlockChain</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-container">
+                <button id="leave-group-btn" class="action-btn danger-btn">
+                    <span>Leave Group</span>
+                </button>
+                <button id="apply-check-btn" class="action-btn primary-btn">
+                    <span>Apply Check/Receipt</span>
+                </button>
+                <button id="placeholder-btn" class="action-btn secondary-btn">
+                    <span>Action 3</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leave Group Confirmation Modal -->
+    <div id="leave-group-modal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Leave Group</h3>
+            <p>Are you sure you want to leave this group? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button id="confirm-leave" class="modal-btn danger-btn">Yes, Leave</button>
+                <button id="cancel-leave" class="modal-btn secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apply Check/Receipt Modal -->
+    <div id="apply-check-modal" class="modal">
+        <div class="modal-content">
+            <h3>Apply Check/Receipt</h3>
+            <p>Select who will pay for this expense:</p>
+            <div class="check-form">
+                <div class="expense-input">
+                    <label for="expense-amount">Total Amount:</label>
+                    <input type="number" id="expense-amount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="people-selection">
+                    <h4>Select People:</h4>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="payer" value="john" checked>
+                            <span>John Doe</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="payer" value="jane">
+                            <span>Jane Smith</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="payer" value="mike">
+                            <span>Mike Johnson</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="payer" value="sarah">
+                            <span>Sarah Wilson</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="split-preview">
+                    <p id="split-amount">Amount per person: $0.00</p>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="confirm-apply" class="modal-btn primary-btn">Apply Split</button>
+                <button id="cancel-apply" class="modal-btn secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Confirmation Modal -->
+    <div id="payment-confirmation-modal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Payment</h3>
+            <p>Process <span id="payment-method">Cash</span> payment for <span id="payment-person-name">Person</span>?</p>
+            <div class="modal-buttons">
+                <button id="confirm-payment" class="modal-btn primary-btn">Confirm Payment</button>
+                <button onclick="hideModal(document.getElementById('payment-confirmation-modal'))" class="modal-btn secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <h3>✅ Success</h3>
+            <p id="success-message">Operation completed successfully!</p>
+            <div class="modal-buttons">
+                <button onclick="hideModal(document.getElementById('success-modal'))" class="modal-btn primary-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="modal">
+        <div class="modal-content">
+            <h3>❌ Error</h3>
+            <p id="error-message">An error occurred!</p>
+            <div class="modal-buttons">
+                <button onclick="hideModal(document.getElementById('error-modal'))" class="modal-btn danger-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="group_table.js"></script>
+</body>
+</html>
